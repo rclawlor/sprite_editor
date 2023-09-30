@@ -126,18 +126,6 @@ int main()
         }
     }
 
-    // Draw working grid
-    for (int i=SCREEN_WIDTH/2 - RENDER_SIZE*TILE_SIZE/2; i<=SCREEN_WIDTH/2 + RENDER_SIZE*TILE_SIZE/2; ++i)
-    {
-        for (int j=SCREEN_HEIGHT/2 - RENDER_SIZE*TILE_SIZE/2; j<=SCREEN_HEIGHT/2 + RENDER_SIZE*TILE_SIZE/2; ++j)
-        {
-            if ((i-SCREEN_WIDTH/2)%RENDER_SIZE==0 || (j-SCREEN_HEIGHT/2)%RENDER_SIZE==0)
-            {
-                pixels[i + j*SCREEN_WIDTH] = 0x000000ff;
-            }
-        }
-    }
-
     ColourButton colour_palette[COLOURS];
     int colour_index = 0;
     int palette_x = 512;
@@ -166,6 +154,25 @@ int main()
     FILE *sprite;
     Sprite sprite_sheet[N_TILES];
 
+    sprite = fopen("../sprite_sheet.csv", "r");
+    int result;
+    char str[128];
+    char offset = "0";
+    // do {
+    //     result = fscanf(sprite, "%127[^; ,\n]", str);
+
+    //     if(result == 0)
+    //     {
+    //         result = fscanf(sprite, "%*c");
+    //     }
+    //     else
+    //     {
+    //         //Put here whatever you want to do with your value.
+    //         printf("%d,", atoi(str));
+    //     }
+
+    // } while(result != EOF);
+
     for (int i=0; i<N_TILES; ++i)
     {
         sprite_sheet[i].index = i;
@@ -173,10 +180,29 @@ int main()
         sprite_sheet[i].x = 2*(i%TILE_SIZE)*TILE_SIZE + SPRITE_SHEET_X;
         sprite_sheet[i].y = 2*(i/TILE_SIZE)*TILE_SIZE + SPRITE_SHEET_Y;
         
-        for (int j=0; j<TILE_SIZE*TILE_SIZE; ++j)
+        int j = 0;
+        while (j<TILE_SIZE*TILE_SIZE)
         {
-            sprite_sheet[i].colour_data[j] = 0;
+            result = fscanf(sprite, "%127[^; ,\n]", str);
+
+            if(result == 0)
+            {
+                result = fscanf(sprite, "%*c");
+            }
+            else
+            {
+                //Put here whatever you want to do with your value.
+                // printf("%d,", atoi(str));
+                sprite_sheet[i].colour_data[j] = atoi(str);
+                ++j;
+            }
         }
+
+        // for (int j=0; j<TILE_SIZE*TILE_SIZE; ++j)
+        // {
+            
+        //     sprite_sheet[i].colour_data[j] = 0;
+        // }
     }
 
     Sprite current_sprite = sprite_sheet[0];
@@ -254,19 +280,36 @@ int main()
         }
 
         draw_canvas(pixels, &current_sprite, sprite_sheet);
+
+        // Draw working grid
+        for (int i=SCREEN_WIDTH/2 - RENDER_SIZE*TILE_SIZE/2; i<=SCREEN_WIDTH/2 + RENDER_SIZE*TILE_SIZE/2; ++i)
+        {
+            for (int j=SCREEN_HEIGHT/2 - RENDER_SIZE*TILE_SIZE/2; j<=SCREEN_HEIGHT/2 + RENDER_SIZE*TILE_SIZE/2; ++j)
+            {
+                if ((i-SCREEN_WIDTH/2)%RENDER_SIZE==0 || (j-SCREEN_HEIGHT/2)%RENDER_SIZE==0)
+                {
+                    pixels[i + j*SCREEN_WIDTH] = 0x000000ff;
+                }
+            }
+    }
         draw_sprite_sheet(pixels, 20, 20, sprite_sheet);
 
-        // if (keyboard.input[SDL_SCANCODE_S])
-        // {
-        //     sprite = fopen("../sprite.c", "w");
-        //     fprintf(sprite, "int sprite[] = {\n");
-        //     for (int i=0; i<TILE_SIZE*TILE_SIZE; ++i)
-        //     {
-        //         fprintf(sprite, "\t%d,\n", sprite_data[i]);
-        //     }
-        //     fprintf(sprite, "};\n");
-        //     fclose(sprite);
-        // }
+        if (keyboard.input[SDL_SCANCODE_S] && keyboard.input[SDL_SCANCODE_LCTRL])
+        {
+            sprite = fopen("../sprite_sheet.csv", "w");
+            // fprintf(sprite, "int sprite_sheet[] = {\n");
+            for (int i=0; i<N_TILES; ++i)
+            {
+                // fprintf(sprite, "\t");
+                for (int j=0; j<TILE_SIZE*TILE_SIZE; ++j)
+                {
+                    fprintf(sprite, "%d, ", sprite_sheet[i].colour_data[j]);
+                }
+                fprintf(sprite, "\n");
+            }
+            // fprintf(sprite, "};\n");
+            fclose(sprite);
+        }
 
         // It's a good idea to clear the screen every frame,
         // as artifacts may occur if the window overlaps with
@@ -328,17 +371,6 @@ void colour_select(ColourButton *button, MouseInput *mouse, ColourButton *curren
 
 void draw_pixel(int *pixels, int pixel_x, int pixel_y, ColourButton *colour, Sprite *sprite, Sprite sprite_sheet[])
 {
-    int area_corner_x = SCREEN_WIDTH/2 - RENDER_SIZE*TILE_SIZE/2;
-    int area_corner_y = SCREEN_HEIGHT/2 - RENDER_SIZE*TILE_SIZE/2;
-
-    int buffer_index = area_corner_x + area_corner_y*SCREEN_WIDTH + pixel_x*RENDER_SIZE + pixel_y*RENDER_SIZE*SCREEN_WIDTH;
-
-    // for (int i=1; i<RENDER_SIZE; ++i) {
-    //     for (int j=1; j<RENDER_SIZE; ++j) {
-    //         pixels[buffer_index + i + j*SCREEN_WIDTH] = palette[colour->colour_index];
-    //     }
-    // }
-
     sprite_sheet[sprite->index].colour_data[pixel_x + TILE_SIZE*pixel_y] = colour->colour_index;
 };
 
