@@ -1,0 +1,8 @@
+{
+    "ros.distro": "humble",
+    "files.associations": {
+        "bitset": "c",
+        "sdl.h": "c",
+        "stdbool.h": "c"
+    }
+}

@@ -1,0 +1,3 @@
+/home/ronan/c/sprite_editor/cmake/CMakeFiles/sprite_editor.dir
+/home/ronan/c/sprite_editor/cmake/CMakeFiles/edit_cache.dir
+/home/ronan/c/sprite_editor/cmake/CMakeFiles/rebuild_cache.dir

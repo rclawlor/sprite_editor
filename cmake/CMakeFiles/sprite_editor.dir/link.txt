@@ -1,0 +1,1 @@
+/usr/bin/cc  -std=c99 CMakeFiles/sprite_editor.dir/src/main.c.o -o ../bin/sprite_editor  -L/usr/lib/x86_64-linux-gnu  -lSDL2 -lm 
